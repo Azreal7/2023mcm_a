@@ -120,23 +120,32 @@ def get_xy(nums, distance):
     return x, y
 
 # 以下函数为第二题特供优化版
-def new_get_shadow_loss(len, average_distance, h1, len1):
-    al = []
+def new_get_shadow_loss(distance, h_mirror, length, len):
     r = 100
+    al = []
     t = np.zeros((12, 5, len))
     loss = np.zeros((12, 5, len))
     for i in range(len):
         al.append(r)
-        al[i] = np.arctan(84-h1/al[i]) # 塔与定日镜tan, a1
-        r += average_distance
+        al[i] = np.arctan(84-h_mirror/al[i]) # alpha
+        r += distance
     for month in range(12):
         for time in range(5):
             for i in range(len):
-                t[month][time][i] = (np.pi/2-np.arccos(c.cos_theta[month][time])-al[i])/2 # a2
-                x1 = np.pi/2-(t[month][time][i]+al[i]) # a3
-                a4 = np.pi/2+np.arccos(c.cos_theta[month][time])-x1
-                loss[month][time][i] = average_distance*np.sin(np.pi/2-np.arccos(c.cos_theta[month][time]))/(len1*np.sin(a4))
-                if loss[month][time][i] > 1 or i == 0:
+                t[month][time][i] = (np.pi/2-np.arccos(c.cos_theta[month][time])-al[i])/2
+                if i == 0:
+                    loss[month][time][i] = 1
+                    continue
+                h1 = distance*np.tan(al[i])
+                c0 = h1
+                b = length*np.sin(al[i])+length*np.cos(al[i])*np.tan(np.arccos(c.cos_theta[month][time]))
+                x_a = (b+c0)/(np.tan(al[i])+np.tan(np.arccos(c.cos_theta[month][time])))*-1
+                y_a = np.tan(np.arccos(c.cos_theta[month][time]))*x_a+b
+                x_b = -1*length*np.cos(al[i])-distance+length*np.cos(al[i])
+                y_b = -1*np.tan(al[i])*length-c0
+                D_ab = np.sqrt((x_a-x_b)**2+(y_a-y_b)**2)
+                loss[month][time][i] = D_ab/length
+                if loss[month][time][i] > 1:
                     loss[month][time][i] = 1
     return loss, t
 
@@ -160,7 +169,7 @@ def new_get_heat_W(light_effi, S, DNI, len, shadow_loss, nums):
     return E_field
 #
 
-# len:圈数,cos_delta:cos太阳方位角,cos_alpha:cos太阳高度角,a_d:圈间距,h_mirror:镜子高度,length:镜子长度,width:镜子宽度, height_diff:两镜高度差
+# len:圈数,a_d:圈间距,h_mirror:镜子高度,length:镜子长度,width:镜子宽度, height_diff:两镜高度差
 def q3_get_shadow_loss(distance, h_mirror, length, width, height, len=c.max_circle):
     r = 100
     al = []

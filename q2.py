@@ -23,7 +23,7 @@ class sa_tsp:
         nums = f.get_nums(state[0], state[3], state[4])
         S = state[0]*state[1]
         x, y = f.get_xy(nums, state[4])
-        loss, t = f.new_get_shadow_loss(len(nums), state[4], state[1], state[2])
+        loss, t = f.new_get_shadow_loss(state[4], 4, 6, len(nums))
         d_HR, eta_at = f.new_get_d_HR(state[2], len(nums), state[4])
         effi_trunc = f.get_trunc_effi(8, 7, state[0], state[1], len(nums), d_HR)
         effi_cos = f.get_effi_cos(t, len(nums))
