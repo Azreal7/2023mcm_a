@@ -16,15 +16,16 @@ class sa_tsp:
     # 获取当前状态的功率密度
     def get_power_density(self, state):
         power, _ = self.get_power(state)
-        return power / (state[0] * state[1] * state[3])
+        area = state[0] * state[1] * state[3]
+        return power / area
 
     # 获取当前状态的功率值和摆放的圈数
     def get_power(self, state):
-        nums = f.get_nums(state[0], state[1], state[2], state[3], state[4])
+        nums = f.get_nums(state[1], state[3], state[4])
         S = state[0]*state[1]
         x, y = f.get_xy(nums, state[4])
-        loss, t = f.new_get_shadow_loss(len(nums), c.cos_delta, c.cos_alpha, state[4], state[1], 84, state[2])
-        d_HR, eta_at = f.new_get_d_HR(80, state[2], len(nums), state[4])
+        loss, t = f.new_get_shadow_loss(len(nums), state[4], state[1], state[2])
+        d_HR, eta_at = f.new_get_d_HR(state[2], len(nums), state[4])
         effi_trunc = f.get_trunc_effi(8, 7, state[0], state[1], len(nums), d_HR)
         effi_cos = f.get_effi_cos(t, len(nums))
         light_effi = f.get_light_effi(loss, effi_cos, eta_at, effi_trunc, len(nums))
