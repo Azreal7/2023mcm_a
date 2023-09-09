@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import constance as c
 
 def distance_3d(a:tuple, b:tuple):
     return np.sqrt((a[0]-b[0])**2+(a[1]-b[1])**2+(a[2]-b[2])**2)
@@ -23,7 +24,6 @@ def get_average_mni(input, len):
 
 # 计算阴影遮挡损失, 输入为：所有定日镜的坐标,cos太阳方位角,cos太阳高度角,镜面高度，吸收塔高度,镜面长度,镜子间距
 def get_shadow_effi(x, y, cos_delta, cos_alpha, h1, h2, len1, average_distance):
-    cos_theta = np.zeros((12, 5)) # 太阳入射角
     al = []
     t = np.zeros((12, 5, len(x)))
     loss = np.zeros((12, 5, len(x)))
@@ -32,12 +32,11 @@ def get_shadow_effi(x, y, cos_delta, cos_alpha, h1, h2, len1, average_distance):
         al[i] = np.arctan(h2-h1/al[i]) # 塔与定日镜tan, a1
     for month in range(12):
         for time in range(5):
-            cos_theta[month][time] = cos_delta[month]*cos_alpha[month][time] # 太阳入射角
             for i in range(len(x)):
-                t[month][time][i] = (np.pi/2-np.arccos(cos_theta[month][time])-al[i])/2 # a2
+                t[month][time][i] = (np.pi/2-np.arccos(c.cos_theta[month][time])-al[i])/2 # a2
                 x1 = np.pi/2-(t[month][time][i]+al[i]) # a3
-                a4 = np.pi/2+np.arccos(cos_theta[month][time])-x1
-                loss[month][time][i] = average_distance*np.sin(np.pi/2-np.arccos(cos_theta[month][time]))/(len1*np.sin(a4))
+                a4 = np.pi/2+np.arccos(c.cos_theta[month][time])-x1
+                loss[month][time][i] = average_distance*np.sin(np.pi/2-np.arccos(c.cos_theta[month][time]))/(len1*np.sin(a4))
                 if loss[month][time][i] > 1 or int(distance_2d((0, 0), (x[i], y[i]))) == 107:
                     loss[month][time][i] = 1
     return loss, t
@@ -122,7 +121,6 @@ def get_xy(nums, distance):
 
 # 以下函数为第二题特供优化版
 def new_get_shadow_loss(len, cos_delta, cos_alpha, average_distance, h1, h2, len1):
-    cos_theta = np.zeros((12, 5)) # 太阳入射角
     al = []
     r = 100
     t = np.zeros((12, 5, len))
@@ -133,12 +131,11 @@ def new_get_shadow_loss(len, cos_delta, cos_alpha, average_distance, h1, h2, len
         r += average_distance
     for month in range(12):
         for time in range(5):
-            cos_theta[month][time] = cos_delta[month]*cos_alpha[month][time] # 太阳入射角
             for i in range(len):
-                t[month][time][i] = (np.pi/2-np.arccos(cos_theta[month][time])-al[i])/2 # a2
+                t[month][time][i] = (np.pi/2-np.arccos(c.cos_theta[month][time])-al[i])/2 # a2
                 x1 = np.pi/2-(t[month][time][i]+al[i]) # a3
-                a4 = np.pi/2+np.arccos(cos_theta[month][time])-x1
-                loss[month][time][i] = average_distance*np.sin(np.pi/2-np.arccos(cos_theta[month][time]))/(len1*np.sin(a4))
+                a4 = np.pi/2+np.arccos(c.cos_theta[month][time])-x1
+                loss[month][time][i] = average_distance*np.sin(np.pi/2-np.arccos(c.cos_theta[month][time]))/(len1*np.sin(a4))
                 if loss[month][time][i] > 1 or i == 0:
                     loss[month][time][i] = 1
     return loss, t
@@ -162,3 +159,11 @@ def new_get_heat_W(light_effi, S, DNI, len, shadow_loss, nums):
             E_field[month][time] *= DNI[month][time]
     return E_field
 #
+
+# len:圈数,cos_delta:cos太阳方位角,cos_alpha:cos太阳高度角,a_d:圈间距,h1:镜子高度,h2:吸收塔高度,len1:镜面长度,len2:镜面宽度
+def q3_get_shadow_loss(len, cos_delta, cos_alpha, average_distance, h1, h2, len1, len2):
+    r = 100
+    al = []
+    t = np.zeros((12, 5, len))
+    loss = np.zeros((12, 5, len))
+    return loss, t

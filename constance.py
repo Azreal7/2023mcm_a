@@ -43,3 +43,8 @@ c = 0.2711 + 0.01858*(2.5-H)**2
 for month in range(12):
     for time in range(5):
         DNI[month][time] = G_0*(a+b*math.exp(-c/sin_alpha[month][time]))
+
+cos_theta = np.zeros((12, 5)) # 太阳入射角
+for month in range(12):
+        for time in range(5):
+            cos_theta[month][time] = cos_delta[month]*cos_alpha[month][time] # 太阳入射角
