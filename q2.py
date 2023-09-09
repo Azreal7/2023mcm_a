@@ -16,12 +16,11 @@ class sa_tsp:
     # 获取当前状态的功率密度
     def get_power_density(self, state):
         power, _ = self.get_power(state)
-        area = state[0] * state[1] * state[3]
-        return power / area
+        return power / (state[0] * state[1] * state[3])
 
     # 获取当前状态的功率值和摆放的圈数
     def get_power(self, state):
-        nums = f.get_nums(state[1], state[3], state[4])
+        nums = f.get_nums(state[0], state[3], state[4])
         S = state[0]*state[1]
         x, y = f.get_xy(nums, state[4])
         loss, t = f.new_get_shadow_loss(len(nums), state[4], state[1], state[2])
@@ -100,8 +99,7 @@ if __name__ == '__main__':
 
     start_time = time.time()
 
-    initial_state = [7, 7, 4, 2300, 13]
-    initial_state = [7, 5.145833647521261, 4, 2360, 12.271304748613044]
+    initial_state = [5.5, 5.5, 4, 2900, 10.5]
 
     # 模拟退火
     test = sa_tsp(10, 0.1, 100)

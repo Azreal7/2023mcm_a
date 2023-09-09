@@ -193,7 +193,7 @@ def q3_get_shadow_loss(distance, h_mirror, length, width, height, len=c.max_circ
                     loss[month][time][i] = 1
     return loss, t
 
-# distance:间距, number:数量, width:宽度, 
+# distance:间距, number:数量, width:宽度
 def q3_get_new_nums(distances, number, width):
     r = 100
     nums = np.zeros(c.max_circle)
@@ -224,16 +224,16 @@ def q3_get_d_HR(height, distances, len=c.max_circle):
 def q3_get_xy(nums, distances):
     r = 100
     nums_len = len(nums)
-    x = np.zeros(c.max_circle)
-    y = np.zeros(c.max_circle)
+    x = []
+    y = []
     for i in range(nums_len):
         deg = 0
         if nums[i] == 0:
             break
         deg_plus = 2*math.pi*r/nums[i]
         for _ in range(int(nums[i])):
-            x[i] = np.cos(deg)*r
-            y[i] = np.sin(deg)*r
+            x.append(np.cos(deg)*r)
+            y.append(np.sin(deg)*r)
             deg += deg_plus
         r += distances[i]
     return x, y
@@ -254,3 +254,6 @@ def q3_get_heat_W(light_effi, S, DNI, len, shadow_loss, nums):
                 E_field[month][time] += S[i]*(shadow_loss[month][time][i])*light_effi[month][time][i]*nums[i]
             E_field[month][time] *= DNI[month][time]
     return E_field
+
+
+

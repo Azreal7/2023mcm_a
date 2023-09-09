@@ -18,8 +18,6 @@ class sa_tsp:
         power, num = self.get_power(state)
         area = 0
         for i in range(len(num)):
-            if num[i] == 0:
-                break
             area += state[1][i] * state[2][i] * num[i]
         return power / area
 
@@ -47,20 +45,26 @@ class sa_tsp:
         for i in range(1, 5):
             next_state.append(state[i].copy())
         vary_list = [100, 4, 4, 2, 10]
+        # vary_list = [0,0,0,0,0]
         flag = random.choice([-1, 1])
         vary_num = random.random()
         select_num = random.random()
-        if select_num >= 0.7:
+        if select_num >= 0.5:
             next_state[0] = next_state[0] + flag * vary_list[i] * vary_num
-        for i in range(c.max_circle):       # 最大圈数
-            for j in range(1, 5):
-                flag = random.choice([-1, 1])
-                vary_num = random.random()
-                select_num = random.random()
-                if select_num >= 0.7:
-                    next_state[j][i] = next_state[j][i] + flag * vary_list[j] * vary_num
+        row_select = random.randint(0, c.max_circle - 1)
+        flag = random.choice([-1, 1])
+        vary_num = random.random()
+        select_num = random.random()
+        c_select = random.randint(1, 4)
+        next_state[c_select][row_select] = next_state[c_select][row_select] + flag * vary_list[c_select] * vary_num
+        # for i in range(c.max_circle):       # 最大圈数
+        #     for j in range(1, 5):
+        #         flag = random.choice([-1, 1])
+        #         vary_num = random.random()
+        #         select_num = random.random()
+        #         if select_num >= 0.5:
+        #             next_state[j][i] = next_state[j][i] + flag * vary_list[j] * vary_num
         next_state[0] = int(next_state[0])      # 数目只能是整数
-        power, num = self.get_power(next_state)
         power, num = self.get_power(next_state)
         if self.is_valid(next_state, power, num):
             return next_state
@@ -73,9 +77,9 @@ class sa_tsp:
         for i in range(len(num)):
             if num[i] == 0:
                 break
-            valid = valid and 2 <= state[1][i] <= 8 and 2 <= state[2][i] <= 8 and 2 <= state[3][i] <= 6\
-            and state[1][i] >= state[3][i] * 2 and state[1][i] <= state[2][i] and\
-            state[4][i] >= state[2][i] + 5 
+            valid = valid and 2 <= state[1][i] <= 8 and 2 <= state[2][i] <= 8 and 2 <= state[3][i] <= 6 \
+                    and state[1][i] <= state[3][i] * 2 and state[1][i] <= state[2][i] \
+                    and state[4][i] >= state[2][i] + 5
         r = 100
         for i in range(len(num)-1):
             r += state[4][i]
@@ -108,13 +112,11 @@ class sa_tsp:
                 if rec_p > random.uniform(0, 1):
                     state = new_state
 
-                # print("state:", state, "pd:", new_power_density)
-
                 # 判断是否更优
                 if new_power_density > best_power_density:
                     best_state = new_state
                     best_power_density = new_power_density
-                    print("temp:", cur_temp, ", best_power_density:", best_power_density, "state:", best_state)
+                    # print("temp:", cur_temp, ", best_power_density:", best_power_density, "state:", best_state)
 
             print("temp:", cur_temp, ", best_power_density:", best_power_density, "state:", best_state)
             # 更新温度
@@ -127,7 +129,7 @@ if __name__ == '__main__':
 
     start_time = time.time()
 
-    initial_state = [2300, [7] * c.max_circle, [5] * c.max_circle, [4] * c.max_circle, [13] * c.max_circle]
+    initial_state = [2900, [5.4] * c.max_circle, [5.4] * c.max_circle, [4] * c.max_circle, [10.4] * c.max_circle]
 
     # 模拟退火
     test = sa_tsp(10, 0.1, 100)
