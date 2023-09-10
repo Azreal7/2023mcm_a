@@ -45,7 +45,7 @@ class sa_tsp:
         for i in range(1, 5):
             next_state.append(state[i].copy())
         vary_list = [100, 4, 4, 2, 10]
-        # vary_list = [0,0,0,0,0]
+        vary_list = [0,0,0,0,0]
         flag = random.choice([-1, 1])
         vary_num = random.random()
         select_num = random.random()
@@ -82,6 +82,9 @@ class sa_tsp:
                     and state[4][i] >= state[2][i] + 5
         r = 100
         for i in range(len(num)-1):
+            if num[i] == 0:
+                r -= state[4][i-1]
+                break
             r += state[4][i]
         return valid and r <= 350 and power >= 60000
 
@@ -129,7 +132,7 @@ if __name__ == '__main__':
 
     start_time = time.time()
 
-    initial_state = [2900, [5.4] * c.max_circle, [5.4] * c.max_circle, [4] * c.max_circle, [10.4] * c.max_circle]
+    initial_state = [2900, [5.5] * c.max_circle, [5.5] * c.max_circle, [4] * c.max_circle, [10.5] * c.max_circle]
 
     # 模拟退火
     test = sa_tsp(10, 0.1, 100)
