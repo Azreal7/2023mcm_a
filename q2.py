@@ -31,16 +31,30 @@ class sa_tsp:
         effi_cos = f.get_effi_cos(t, len(nums))
         light_effi = f.get_light_effi(loss, effi_cos, eta_at, effi_trunc, len(nums))
         E_field = f.new_get_heat_W(light_effi, S, c.DNI, len(nums), loss, nums)
-        # E = []
-        # for i in range(len(nums)):
-        #     for _ in range(nums[i]):
-        #         E.append(state[5][i])
-        # plt.scatter(x, y, c=E)
-        # plt.colorbar()
-        # plt.show()
         return np.mean(E_field), len(nums)
 
-
+    def get_power_and_print(self, state):
+        nums = f.get_nums(state[0], state[3], state[4])
+        S = state[0]*state[1]
+        x, y = f.get_xy(nums, state[4])
+        loss, t = f.new_get_shadow_loss(state[4], 4, 6, len(nums))
+        f.get_average_mni(loss, len(nums))
+        d_HR, eta_at = f.new_get_d_HR(state[2], len(nums), state[4])
+        effi_trunc = f.get_trunc_effi(8, 7, state[0], state[1], len(nums), d_HR)
+        print(np.mean(effi_trunc))
+        effi_cos = f.get_effi_cos(t, len(nums))
+        f.get_average_mni(effi_cos, len(nums))
+        light_effi = f.get_light_effi(loss, effi_cos, eta_at, effi_trunc, len(nums))
+        f.get_average_mni(light_effi, len(nums))
+        density = []
+        E_field = f.new_get_heat_W(light_effi, S, c.DNI, len(nums), loss, nums)
+        for i in range(12):
+            E = 0
+            for time in range(5):
+                E += E_field[i][time]
+            density.append(E/(36*len(x)*5))
+        print(density)
+        return np.mean(E_field), len(nums)
     # 获取下一个状态
     # 如果符合约束条件，则返回新状态，否则放回原状态
     def get_next_state(self, state):
@@ -70,7 +84,6 @@ class sa_tsp:
     # 模拟退火算法
     def simulated_annealing(self, initial_state):
         state = initial_state
-
         best_power_density, best_state = self.get_power_density(initial_state), initial_state
         cur_temp = self.start_temp
         change_num = 0
@@ -96,11 +109,10 @@ class sa_tsp:
                     best_state = new_state
                     best_power_density = new_power_density
                     # print("temp:", cur_temp, ", best_power_density:", best_power_density, "state:", best_state)
-
-            print("temp:", cur_temp, ", best_power_density:", best_power_density, "state:", best_state)
+            # print("temp:", cur_temp, ", best_power_density:", best_power_density, "state:", best_state)
             # 更新温度
-            cur_temp = self.update_temp(cur_temp, change_num)
 
+            cur_temp = self.update_temp(cur_temp, change_num)
         return best_power_density, best_state
 
 
@@ -111,18 +123,15 @@ if __name__ == '__main__':
     initial_state = [5.5, 5.5, 4, 2900, 10.5]
 
     # 模拟退火
-    test = sa_tsp(100, 0.1, 100)
+    test = sa_tsp(10, 0.1, 100)
     best_power_density, best_state = test.simulated_annealing(initial_state)
 
     end_time = time.time()
 
-    print(best_power_density)
-    print(best_state)
+    # print(best_power_density)
+    # print(best_state)
+    print(test.get_power_and_print(best_state))
     print("time:", end_time-start_time, "s")
-    nums = f.get_nums(best_state[0], best_state[3], best_state[4])
-    x, y = f.get_xy(nums, best_state[4])
-    df = pd.DataFrame({'定日镜宽度 (m)':[best_state[0]]*best_state[3], '定日镜高度 (m)':[best_state[1]]*best_state[3], '定日镜x坐标 (m)':x, '定日镜y坐标 (m)':y})
-    df.to_excel('result2.xlsx')
 
 
 

@@ -119,7 +119,7 @@ def get_xy(nums, distance):
         r += distance
     return x, y
 
-# 以下函数为第二题特供优化版
+# 以下函数为第二题优化版
 def new_get_shadow_loss(distance, h_mirror, length, len):
     r = 100
     al = []
@@ -167,7 +167,6 @@ def new_get_heat_W(light_effi, S, DNI, len, shadow_loss, nums):
                 E_field[month][time] += S*(shadow_loss[month][time][i])*light_effi[month][time][i]*nums[i]
             E_field[month][time] *= DNI[month][time]
     return E_field
-#
 
 # len:圈数,a_d:圈间距,h_mirror:镜子高度,length:镜子长度,width:镜子宽度, height_diff:两镜高度差
 def q3_get_shadow_loss(distance, h_mirror, length, width, height, len=c.max_circle):
