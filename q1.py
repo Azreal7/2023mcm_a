@@ -10,6 +10,9 @@ df = pd.read_excel(r"附件.xlsx")
 x = df['x坐标 (m)'].tolist()
 y = df['y坐标 (m)'].tolist()
 
+# plt.scatter(x, y)
+# plt.show()
+
 d_HR, eta_at = f.get_d_HR(x, y, 84, 4, len(x))
 
 # 此部分用于区分x,y中不同的圆，以计算圆之间的平均距离

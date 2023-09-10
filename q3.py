@@ -4,6 +4,8 @@ import numpy as np
 import math
 import time
 import random
+from matplotlib import pyplot as plt
+import pandas as pd
 
 
 class sa_tsp:
@@ -35,6 +37,13 @@ class sa_tsp:
         effi_cos = f.get_effi_cos(t, c.max_circle)
         light_effi = f.get_light_effi(loss, effi_cos, eta_at, effi_trunc, c.max_circle)
         E_field = f.q3_get_heat_W(light_effi, S, c.DNI, c.max_circle, loss, nums)
+        # E = []
+        # for i in range(len(nums)):
+        #     for _ in range(int(nums[i])):
+        #         E.append(light_effi[0][0][i])
+        # plt.scatter(x, y, c=E)
+        # plt.colorbar()
+        # plt.show()
         return np.mean(E_field), nums
 
 
@@ -45,7 +54,7 @@ class sa_tsp:
         for i in range(1, 5):
             next_state.append(state[i].copy())
         vary_list = [100, 4, 4, 2, 10]
-        vary_list = [0,0,0,0,0]
+        # vary_list = [1, 1, 1, 1, 1]
         flag = random.choice([-1, 1])
         vary_num = random.random()
         select_num = random.random()
@@ -82,16 +91,13 @@ class sa_tsp:
                     and state[4][i] >= state[2][i] + 5
         r = 100
         for i in range(len(num)-1):
-            if num[i] == 0:
-                r -= state[4][i-1]
-                break
             r += state[4][i]
         return valid and r <= 350 and power >= 60000
 
     # 降温函数
     def update_temp(self, temp, num):
         # return self.start_temp / math.log(1+num)
-        return 0.99 * temp
+        return 0.9 * temp
 
     # 模拟退火算法
     def simulated_annealing(self, initial_state):
@@ -121,7 +127,7 @@ class sa_tsp:
                     best_power_density = new_power_density
                     # print("temp:", cur_temp, ", best_power_density:", best_power_density, "state:", best_state)
 
-            print("temp:", cur_temp, ", best_power_density:", best_power_density, "state:", best_state)
+            print("temp:", cur_temp, ", best_power_density:", best_power_density)
             # 更新温度
             cur_temp = self.update_temp(cur_temp, change_num)
 
@@ -132,10 +138,11 @@ if __name__ == '__main__':
 
     start_time = time.time()
 
-    initial_state = [2900, [5.5] * c.max_circle, [5.5] * c.max_circle, [4] * c.max_circle, [10.5] * c.max_circle]
+    initial_state = [2900, [5.4] * c.max_circle, [5.4] * c.max_circle, [4] * c.max_circle, [10.4] * c.max_circle]
+    # initial_state = [3000, [5] * c.max_circle, [5] * c.max_circle, [4] * c.max_circle, [10] * c.max_circle]
 
     # 模拟退火
-    test = sa_tsp(10, 0.1, 100)
+    test = sa_tsp(100, 0.1, 100)
     best_power_density, best_state = test.simulated_annealing(initial_state)
 
     end_time = time.time()
@@ -143,3 +150,16 @@ if __name__ == '__main__':
     print(best_power_density)
     print(best_state)
     print("time:", end_time-start_time, "s")
+    nums = f.q3_get_new_nums(best_state[4], best_state[0], best_state[2])
+    x, y = f.q3_get_xy(nums, best_state[4])
+    # state:数量 长度 宽度 高度 距离
+    w = []
+    l = []
+    h = []
+    for i in range(len(nums)):
+        for j in range(int(nums[i])):
+            w.append(best_state[2][i])
+            l.append(best_state[1][i])
+            h.append(best_state[3][i])
+    df = pd.DataFrame({'定日镜宽度 (m)':w, '定日镜高度 (m)':l, '定日镜x坐标 (m)':x, '定日镜y坐标 (m)':y, '定日镜z坐标 (m)':h})
+    df.to_excel('result3.xlsx')

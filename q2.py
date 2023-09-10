@@ -4,6 +4,8 @@ import math
 import function as f
 import numpy as np
 import constance as c
+from matplotlib import pyplot as plt
+import pandas as pd
 
 
 class sa_tsp:
@@ -29,6 +31,13 @@ class sa_tsp:
         effi_cos = f.get_effi_cos(t, len(nums))
         light_effi = f.get_light_effi(loss, effi_cos, eta_at, effi_trunc, len(nums))
         E_field = f.new_get_heat_W(light_effi, S, c.DNI, len(nums), loss, nums)
+        # E = []
+        # for i in range(len(nums)):
+        #     for _ in range(nums[i]):
+        #         E.append(state[5][i])
+        # plt.scatter(x, y, c=E)
+        # plt.colorbar()
+        # plt.show()
         return np.mean(E_field), len(nums)
 
 
@@ -56,7 +65,7 @@ class sa_tsp:
     # 降温函数
     def update_temp(self, temp, num):
         # return self.start_temp / math.log(1+num)
-        return 0.99 * temp
+        return 0.9 * temp
 
     # 模拟退火算法
     def simulated_annealing(self, initial_state):
@@ -102,7 +111,7 @@ if __name__ == '__main__':
     initial_state = [5.5, 5.5, 4, 2900, 10.5]
 
     # 模拟退火
-    test = sa_tsp(10, 0.1, 100)
+    test = sa_tsp(100, 0.1, 100)
     best_power_density, best_state = test.simulated_annealing(initial_state)
 
     end_time = time.time()
@@ -110,6 +119,10 @@ if __name__ == '__main__':
     print(best_power_density)
     print(best_state)
     print("time:", end_time-start_time, "s")
+    nums = f.get_nums(best_state[0], best_state[3], best_state[4])
+    x, y = f.get_xy(nums, best_state[4])
+    df = pd.DataFrame({'定日镜宽度 (m)':[best_state[0]]*best_state[3], '定日镜高度 (m)':[best_state[1]]*best_state[3], '定日镜x坐标 (m)':x, '定日镜y坐标 (m)':y})
+    df.to_excel('result2.xlsx')
 
 
 

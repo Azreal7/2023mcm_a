@@ -111,7 +111,7 @@ def get_xy(nums, distance):
     y = []
     for i in range(nums_len):
         deg = 0
-        deg_plus = 2*math.pi*r/nums[i]
+        deg_plus = 2*math.pi/nums[i]
         for _ in range(nums[i]):
             x.append(np.cos(deg)*r)
             y.append(np.sin(deg)*r)
@@ -239,7 +239,7 @@ def q3_get_xy(nums, distances):
         deg = 0
         if nums[i] == 0:
             break
-        deg_plus = 2*math.pi*r/nums[i]
+        deg_plus = 2*math.pi/nums[i]
         for _ in range(int(nums[i])):
             x.append(np.cos(deg)*r)
             y.append(np.sin(deg)*r)
